@@ -1,4 +1,9 @@
-// Pusher_06092016_ver01
+/////////////////////////////////////////////////////////////////
+//  Korb-Modular
+//  Module: Pusher
+//  Board-Ver:3.0
+//  Date: 10.03.2017
+////////////////////////////////////////////////////////////////
 
 #include <SPI.h>
 #include <math.h>
@@ -68,6 +73,7 @@ int EEP_Adr_Curve_Settings = 2;
 int EEP_Adr_GateMode_Settings = 3;
 int EEP_Adr_Pressure_Threshold_Settings = 4;
 
+
 // *************************************************************************************************
 // **************************************Setup******************************************************
 // *************************************************************************************************
@@ -93,9 +99,18 @@ void setup() {
   GateMode = EEPROM.read(EEP_Adr_GateMode_Settings);
   Pressure_Threshold = EEPROM.read(EEP_Adr_Pressure_Threshold_Settings);
 
+  // Use this Default Setting if nothing is stored in the Eeprom
+  if (Range == 255) Range = 1;
+  if (Curve == 255)  Curve = 1;
+  if (GateMode == 255)  GateMode = 1;
+  if (Pressure_Threshold == 255)  Pressure_Threshold = 0;
+
+
   // Initialize Timer-Interrupt
   //  Timer1.initialize(500000);              // initialize timer1, and set a 1/2 second period
   //  Timer1.attachInterrupt(TimerCallback);  // attaches TimerCallback() as a timer overflow interrupt
+
+
 }
 
 // *************************************************************************************************
@@ -130,20 +145,20 @@ void loop () {
   for (int count = 0; count < 8; count++) {
     // select the bit
 
-      MUL_s0 = bitRead(count, 0);
-      MUL_s1 = bitRead(count, 1);
-      MUL_s2 = bitRead(count, 2);
+    MUL_s0 = bitRead(count, 0);
+    MUL_s1 = bitRead(count, 1);
+    MUL_s2 = bitRead(count, 2);
 
-      digitalWrite(2,  MUL_s0);
-      digitalWrite(3,  MUL_s1);
-      digitalWrite(4,  MUL_s2);
-  
+    digitalWrite(2,  MUL_s0);
+    digitalWrite(3,  MUL_s1);
+    digitalWrite(4,  MUL_s2);
+
 
     Value[count] = map(analogRead(A4), 0, 1023, 0 , 4093);
-/*    Serial.print("POT: ");
-    Serial.print(count);
-    Serial.print(": ");
-    Serial.println(Value[count]);*/
+    //        Serial.print("POT: ");
+    //        Serial.print(count);
+    //        Serial.print(": ");
+    //        Serial.println(Value[count]);
 
   }
   /*
@@ -352,8 +367,8 @@ void setGates() {
 // --------------------------
 // Setting 1 :  Range Select
 // Setting 2 :  Gate or Trigger for Main Gate
-// Setting 3 : Lin/Log/Exp Response
-// 4 => Range 0 - 10,0 V
+// Setting 3 :  Lin/Log/Exp Response
+// Setting 4 :  FSR-Threshold
 // -------------------------
 
 void UserSettings(int Timeout)
@@ -475,7 +490,7 @@ void UserSettings(int Timeout)
     // ---------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------// Settings Pressure Threshold-------------------------------------
     // ---------------------------------------------------------------------------------------------------------------------
-    //Gate vs. Trigger
+    // Treshhold Settings
     // --------------------------
     // 1 => No Threshold (0)
     // 2 => Low Threshold (20)
